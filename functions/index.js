@@ -17,12 +17,25 @@ exports.deleteUser = functions.https.onRequest((req, res) => {
 
     try {
       const { userId } = req.body;
-
       if (!userId) {
         return res.status(400).send({ error: "User ID is required" });
       }
 
+      // Step 1: Retrieve the user document to get the username
+      const userDoc = await admin.firestore().collection('users').doc(userId).get();
+      if (!userDoc.exists) {
+        return res.status(404).send({ error: "User not found" });
+      }
+      const username = userDoc.data().username;
+
+      // Step 2: Delete the user from Firebase Authentication
       await admin.auth().deleteUser(userId);
+
+      // Step 3: Delete the user's document from "users" collection
+      await admin.firestore().collection('users').doc(userId).delete();
+
+      // Step 4: Delete the user's username from "usernames" collection
+      await admin.firestore().collection('usernames').doc(username).delete();
 
       res.status(200).send({ result: `User with ID ${userId} deleted successfully` });
     } catch (error) {
