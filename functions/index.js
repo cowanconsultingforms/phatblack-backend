@@ -1,8 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cors = require('cors')({ origin: true });
-
-// Initialize Firebase Admin with service account
 const serviceAccount = require("../serviceKey.json");
 
 admin.initializeApp({
