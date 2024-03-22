@@ -1,10 +1,13 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const cors = require('cors')({ origin: true });
+const cors = require('cors')
+
+// CORS handler to enable CORS
+const corsHandler = cors({origin: true});
 
 // Cloud Function to delete a user
 const deleteUser = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
+  corsHandler(req, res, async () => { // Use corsHandler to wrap async functions
     if (req.method !== 'DELETE') {
       return res.status(405).send({ error: 'Method Not Allowed' });
     }
@@ -15,20 +18,20 @@ const deleteUser = functions.https.onRequest((req, res) => {
         return res.status(400).send({ error: "User ID is required" });
       }
 
-      // Step 1: Retrieve the user document to get the username
+      // Retrieve the user document to get the username
       const userDoc = await admin.firestore().collection('users').doc(userId).get();
       if (!userDoc.exists) {
         return res.status(404).send({ error: "User not found" });
       }
       const username = userDoc.data().username;
 
-      // Step 2: Delete the user from Firebase Authentication
+      // Delete the user from Firebase Authentication
       await admin.auth().deleteUser(userId);
 
-      // Step 3: Delete the user's document from "users" collection
+      // Delete the user's document from "users" collection
       await admin.firestore().collection('users').doc(userId).delete();
 
-      // Step 4: Delete the user's username from "usernames" collection
+      // Delete the user's username from "usernames" collection
       await admin.firestore().collection('usernames').doc(username).delete();
 
       res.status(200).send({ result: `User with ID ${userId} deleted successfully` });
