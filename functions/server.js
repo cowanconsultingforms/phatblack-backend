@@ -11,6 +11,8 @@ admin.initializeApp({
 
 // Import Cloud Functions
 const deleteUser = require('./cloudFunctions/deleteUser');
+
+//Export them as Cloud Functions. the latter is the name of the API endpoint; exports.apiEndpoint = importedFunction
 exports.deleteUser = deleteUser;
 
 // Setup Express app for API endpoints
