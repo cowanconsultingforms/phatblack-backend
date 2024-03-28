@@ -1,19 +1,19 @@
 const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 const cors = require("cors");
-const serviceAccount = require("../serviceKey.json");
+// const serviceAccount = require("../serviceKey.json");
 
 // Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://phat-black-default-rtdb.firebaseio.com",
-});
+// admin.initializeApp({
+//    credential: admin.credential.cert(serviceAccount),
+//    databaseURL: "https://phat-black-default-rtdb.firebaseio.com",
+// });
 
 // Import Cloud Functions
-const deleteUser = require("./cloudFunctions/deleteUser");
+// const deleteUser = require("./cloudFunctions/deleteUser");
 
 // Export them as Cloud Functions
-exports.deleteUser = deleteUser;
+// exports.deleteUser = deleteUser;
 
 // Setup Express app for API endpoints
 const express = require("express");

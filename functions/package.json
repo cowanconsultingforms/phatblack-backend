@@ -15,7 +15,8 @@
   "main": "server.js",
   "dependencies": {
     "firebase-admin": "^11.8.0",
-    "firebase-functions": "^4.3.1"
+    "firebase-functions": "^4.3.1",
+    "@google/generative-ai": "^0.2.1"
   },
   "devDependencies": {
     "@ampproject/remapping": "^2.3.0",

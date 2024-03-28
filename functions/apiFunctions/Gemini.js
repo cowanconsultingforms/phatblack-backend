@@ -9,6 +9,7 @@ const genAI = new GoogleGenerativeAI(googleApiKey);
  * @param {Object} res The response object.
  */
 async function generateContent(req, res) {
+  console.log("Request body:", req.body);
   const {query, model = "gemini-pro"} = req.body;
   try {
     const genModel = genAI.getGenerativeModel({model});
