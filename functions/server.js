@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("./serviceKey.json");
+const serviceAccount = require("../serviceKey.json");
 // const functions = require("firebase-functions");
 // const cors = require("cors");
 
@@ -24,6 +24,8 @@ admin.initializeApp({
 
 // Import Cloud Functions
 const deleteUser = require("./cloudFunctions/deleteUser");
+const subscriptionPayment = require("./cloudFunctions/subscriptionPayment");
 
 // Export Cloud Functions
 exports.deleteUser = deleteUser;
+exports.subscriptionPayment = subscriptionPayment;
