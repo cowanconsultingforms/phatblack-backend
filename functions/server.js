@@ -8,8 +8,14 @@ const serviceAccount = require("../serviceKey.json");
 // const app = express();
 // app.use(cors({origin: true}));
 // app.use(express.json());
+// const express = require("express");
+// const app = express();
+// app.use(cors({origin: true}));
+// app.use(express.json());
 
 // Import API functions and setup API endpoints
+// const generateContent = require("./apiFunctions/Gemini");
+// app.post("/generateContent", generateContent);
 // const generateContent = require("./apiFunctions/Gemini");
 // app.post("/generateContent", generateContent);
 
