@@ -1,7 +1,7 @@
-require("dotenv").config();
+// require("dotenv").config();
 const functions = require('firebase-functions');
 const cors = require("cors");
-const stripe = require('stripe')(process.env.SECRET_KEY);
+const stripe = require('stripe')(functions.config().stripe.key);
 
 // CORS handler to enable CORS
 const corsHandler = cors({origin: true});
