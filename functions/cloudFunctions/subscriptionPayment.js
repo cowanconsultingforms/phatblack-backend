@@ -12,7 +12,7 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
     if (req.method !== "POST") {
         return res.status(405).send({error: "Method Not Allowed"});
     }
-    let{payment, id, user} = req.body;
+    let{paymentCost, id, user} = req.body;
     try{
         //create payment
         const subscription = await stripe.paymentIntents.create({
