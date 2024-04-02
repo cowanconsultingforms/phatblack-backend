@@ -12,7 +12,7 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
     if (req.method !== "POST") {
         return res.status(405).send({error: "Method Not Allowed"});
     }
-    let{paymentCost, id, user} = req.body;
+    let{payment, id, user} = req.body;
     try{
         //create payment
         const subscription = await stripe.paymentIntents.create({
@@ -26,11 +26,11 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
             confirm: true,
         });
         //update users role to premium user after subscribing
+
         await admin.firestore().collection("users").doc(user).update({
             role: "premium_user",
         });
         console.log(subscription);
-        res.json({message: "Successfully Subscribed", success: true});
     } catch(error){
         res.json({message: "Processing Subscription Failed", success: false});
         console.log(paymentCost, id, user);
