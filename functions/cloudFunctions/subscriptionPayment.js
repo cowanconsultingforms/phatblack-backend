@@ -1,9 +1,13 @@
-require("dotenv").config();
+//require("dotenv").config();
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const cors = require("cors");
-//const stripe = require("stripe")(functions.config().stripe.key);
-const stripe = require("stripe")(process.env.SECRET_KEY);
+
+const stripeKey = functions.config().stripe.key;
+const monthlyPlan = functions.config().stripe.monthly;
+const yearlyPlan = functions.config().stripe.yearly;
+const stripe = require("stripe")(stripeKey);
+//const stripe = require("stripe")(process.env.SECRET_KEY);
 
 
 // CORS handler to enable CORS
@@ -38,7 +42,7 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
                 // Create a subscription
                 const subscription = await stripe.subscriptions.create({
                 customer: customer.id,
-                items: [{price: process.env.MONTHLY_PLAN_KEY}],
+                items: [{price: monthlyPlan}],
                 billing_cycle_anchor: currentTime,
                 });
         
@@ -60,7 +64,7 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
                 // Create a subscription
                 const subscription = await stripe.subscriptions.create({
                 customer: customer.id,
-                items: [{price: process.env.MONTHLY_PLAN_KEY}],
+                items: [{price: monthlyPlan}],
                 trial_period_days: 30,
                 });
         
@@ -85,7 +89,7 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
                 // Create a subscription
                 const subscription = await stripe.subscriptions.create({
                 customer: customer.id,
-                items: [{price: process.env.YEARLY_PLAN_KEY}],
+                items: [{price: yearlyPlan}],
                 billing_cycle_anchor: currentTime,
                 });
         
