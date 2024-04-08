@@ -1,13 +1,18 @@
-// require("dotenv").config();
+require("dotenv").config();
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const cors = require("cors");
 
-const stripeKey = functions.config().stripe.key;
-const monthlyPlan = functions.config().stripe.monthly;
-const yearlyPlan = functions.config().stripe.yearly;
-const stripe = require("stripe")(stripeKey);
-// const stripe = require("stripe")(process.env.SECRET_KEY);
+// const stripeKey = functions.config().stripe.key;
+// const monthlyPlan = functions.config().stripe.monthly;
+// const yearlyPlan = functions.config().stripe.yearly;
+// const stripe = require("stripe")(stripeKey);
+
+const trialPlan = process.env.TRIAL_PLAN_KEY;
+const monthlyPlan = process.env.MONTHLY_PLAN_KEY;
+const yearlyPlan = process.env.YEARLY_PLAN_KEY;
+
+const stripe = require("stripe")(process.env.SECRET_KEY);
 
 
 // CORS handler to enable CORS
@@ -48,10 +53,11 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
 
         console.log("Recurring subscription created:", subscription);
 
-        // Update user's role to premium_user and add customer ID
+        // Update user's role to premium_user , add custmer ID, and add subscription ID for cancelling purposes
         await admin.firestore().collection("users").doc(user).update({
           role: "premium_user",
           customerId: customer.id,
+          subscriptionId: subscription.id,
         });
 
         console.log("Payment completed successfully");
@@ -61,27 +67,38 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
           success: true,
         });
       } else if (paymentCost === 0) {
-        // Create a subscription
-        const subscription = await stripe.subscriptions.create({
-          customer: customer.id,
-          items: [{price: monthlyPlan}],
-          trial_period_days: 30,
-        });
+        //check if user has subscribed before or had a free trial 
+        //if user is a customer, don't allow anymore free trials
+        if(userData.customerId){
+          res.status(400).json({
+            message: "User is not eligible for a free trial",
+            success: false,
+          });
+          return;
+        } else{
+          // Create a subscription
+          const subscription = await stripe.subscriptions.create({
+            customer: customer.id,
+            items: [{price: trialPlan}],
+            trial_period_days: 30,
+          });
 
-        console.log("1 month free trial subscription created:", subscription);
+          console.log("1 month free trial subscription created:", subscription);
 
-        // Update user's role to premium_user and add customer ID
-        await admin.firestore().collection("users").doc(user).update({
-          role: "premium_user",
-          customerId: customer.id,
-        });
+          // Update user's role to premium_user , add custmer ID, and add subscription ID for cancelling purposes
+          await admin.firestore().collection("users").doc(user).update({
+            role: "premium_user",
+            customerId: customer.id,
+            subscriptionId: subscription.id,
+          });
 
-        console.log("1 month free trial subscription completed successfully");
+          console.log("1 month free trial subscription completed successfully");
 
-        res.status(200).json({
-          message: "Free trial + payment successful",
-          success: true,
-        });
+          res.status(200).json({
+            message: "Free trial + payment successful",
+            success: true,
+          });
+        }
       } else if (paymentCost === 1080) {
         // Current time variable for billing cycle
         const currentTime = Math.floor(Date.now() / 1000);
@@ -95,10 +112,11 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
 
         console.log("Recurring subscription created:", subscription);
 
-        // Update user's role to premium_user and add customer ID
+        // Update user's role to premium_user , add custmer ID, and add subscription ID for cancelling purposes
         await admin.firestore().collection("users").doc(user).update({
           role: "premium_user",
           customerId: customer.id,
+          subscriptionId: subscription.id,
         });
 
         console.log("Payment and subscription completed successfully");
@@ -124,10 +142,11 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
 
         console.log("One time payment subscription created:", paymentIntent);
 
-        // Update user's role to premium_user and add customer ID
+        // Update user's role to premium_user and add custmer ID
         await admin.firestore().collection("users").doc(user).update({
           role: "premium_user",
           customerId: customer.id,
+          paymentId: paymentIntent.id,
         });
 
         console.log("Payment and subscription completed successfully");
