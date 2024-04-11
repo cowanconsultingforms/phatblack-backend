@@ -3,16 +3,17 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const cors = require("cors");
 
-// const stripeKey = functions.config().stripe.key;
-// const monthlyPlan = functions.config().stripe.monthly;
-// const yearlyPlan = functions.config().stripe.yearly;
-// const stripe = require("stripe")(stripeKey);
+const stripeKey = functions.config().stripe.key;
+const monthlyPlan = functions.config().stripe.monthly;
+const yearlyPlan = functions.config().stripe.yearly;
+const trialPlan = functions.config().stripe.trial;
+const stripe = require("stripe")(stripeKey);
 
-const trialPlan = process.env.TRIAL_PLAN_KEY;
-const monthlyPlan = process.env.MONTHLY_PLAN_KEY;
-const yearlyPlan = process.env.YEARLY_PLAN_KEY;
+// const trialPlan = process.env.TRIAL_PLAN_KEY;
+// const monthlyPlan = process.env.MONTHLY_PLAN_KEY;
+// const yearlyPlan = process.env.YEARLY_PLAN_KEY;
 
-const stripe = require("stripe")(process.env.SECRET_KEY);
+// const stripe = require("stripe")(process.env.SECRET_KEY);
 
 
 // CORS handler to enable CORS
@@ -30,6 +31,10 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
       const u = await admin.firestore().collection("users").doc(user).get();
       const userData = u.data();
       const userEmail = userData.email;
+      const userRole = userData.role;
+      if (userRole !== "user") {
+        throw new Error("User Already Subscribed");
+      }
 
       // Create a customer
       const customer = await stripe.customers.create({
@@ -53,7 +58,9 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
 
         console.log("Recurring subscription created:", subscription);
 
-        // Update user's role to premium_user , add custmer ID, and add subscription ID for cancelling purposes
+        // Update user's role to premium_user ,
+        // add custmer ID,
+        // add subscription ID for cancelling purposes
         await admin.firestore().collection("users").doc(user).update({
           role: "premium_user",
           customerId: customer.id,
@@ -67,15 +74,15 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
           success: true,
         });
       } else if (paymentCost === 0) {
-        //check if user has subscribed before or had a free trial 
-        //if user is a customer, don't allow anymore free trials
-        if(userData.customerId){
+        // check if user has subscribed before or had a free trial
+        // if user is a customer, don't allow anymore free trials
+        if (userData.customerId) {
           res.status(400).json({
             message: "User is not eligible for a free trial",
             success: false,
           });
           return;
-        } else{
+        } else {
           // Create a subscription
           const subscription = await stripe.subscriptions.create({
             customer: customer.id,
@@ -85,7 +92,9 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
 
           console.log("1 month free trial subscription created:", subscription);
 
-          // Update user's role to premium_user , add custmer ID, and add subscription ID for cancelling purposes
+          // Update user's role to premium_user ,
+          // add custmer ID,
+          // add subscription ID for cancelling purposes
           await admin.firestore().collection("users").doc(user).update({
             role: "premium_user",
             customerId: customer.id,
@@ -112,7 +121,9 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
 
         console.log("Recurring subscription created:", subscription);
 
-        // Update user's role to premium_user , add custmer ID, and add subscription ID for cancelling purposes
+        // Update user's role to premium_user ,
+        // add custmer ID,
+        // add subscription ID for cancelling purposes
         await admin.firestore().collection("users").doc(user).update({
           role: "premium_user",
           customerId: customer.id,
@@ -125,7 +136,7 @@ const subscriptionPayment = functions.https.onRequest((req, res) => {
           message: "Payment completed successfully",
           success: true,
         });
-      } else if (paymentCost === 100000) {
+      } else if (paymentCost === 1000000) {
         // Handle lifetime subscription non-recurring
         const paymentIntent = await stripe.paymentIntents.create({
           amount: paymentCost, // Amount in cents
