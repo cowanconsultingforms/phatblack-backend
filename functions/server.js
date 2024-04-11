@@ -31,7 +31,9 @@ admin.initializeApp({
 // Import Cloud Functions
 const deleteUser = require("./cloudFunctions/deleteUser");
 const subscriptionPayment = require("./cloudFunctions/subscriptionPayment");
+const cancelSubscription = require("./cloudFunctions/cancelSubscription");
 
 // Export Cloud Functions
 exports.deleteUser = deleteUser;
 exports.subscriptionPayment = subscriptionPayment;
+exports.cancelSubscription = cancelSubscription;
