@@ -59,7 +59,7 @@ const videoCompress = functions.storage.object().onFinalize(async (object) => {
         return null;
     }
 
-    const outputFileName = `compressed_${Date.now()}_${fileName}`;
+    const outputFileName = `compressed_${Date.now()}_${fileName}`; // Add a prefix to the output file name
     const outputTempFilePath = path.join(os.tmpdir(), outputFileName);
 
     return new Promise((resolve, reject) => {
