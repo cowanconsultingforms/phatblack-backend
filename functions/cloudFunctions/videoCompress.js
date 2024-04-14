@@ -86,7 +86,7 @@ const videoCompress = functions.storage.object().onFinalize(async (object) => {
                     reject();
                 }
             })
-            .on("error", (error) => {
+            .on("error", (error) => { // Handle any errors during compression
                 console.error("Error compressing video:", error);
                 reject();
             })
