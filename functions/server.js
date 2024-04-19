@@ -22,6 +22,7 @@ const addData = require("./database/addData");
 const searchData = require("./database/searchData");
 const deleteData = require("./database/deleteData");
 const updateData = require("./database/updateData");
+const searchSuggestions = require("./database/searchSuggestions");
 
 const corsHandler = cors({origin: true});
 
@@ -72,6 +73,18 @@ app.put("/update", (req, res) => {
     } catch (error) {
       console.error("Update Error:", error);
       res.status(500).json({error: "Error updating data"});
+    }
+  });
+});
+
+app.get("/searchSuggestions", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const results = await searchSuggestions(req.query.query);
+      res.json(results);
+    } catch (error) {
+      console.error("Search Suggestions Error:", error);
+      res.status(500).json({error: "Error performing search suggestions"});
     }
   });
 });
