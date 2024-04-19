@@ -1,72 +1,79 @@
 // Required for Firebase Functions
 const admin = require("firebase-admin");
 const serviceAccount = require("./serviceKey.json");
-const functions = require('firebase-functions');
+const functions = require("firebase-functions");
 
 // Set up Express server
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 
 // Initialize Express
 const app = express();
-app.use(cors({ origin: true }));
+app.use(cors({origin: true}));
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-const connectMongoDB = require('./database/database');
+const connectMongoDB = require("./database/database");
 connectMongoDB();
 
 // Import MongoDB functions
-const addData = require('./database/addData');
-const searchData = require('./database/searchData');
-const deleteData = require('./database/deleteData');
-const updateData = require('./database/updateData');
+const addData = require("./database/addData");
+const searchData = require("./database/searchData");
+const deleteData = require("./database/deleteData");
+const updateData = require("./database/updateData");
 
-app.post('/addSearchData', async (req, res) => {
-  try {
-    const data = await addData(req.body);
-    res.status(201).send(data);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
+const corsHandler = cors({origin: true});
 
-app.get('/search', async (req, res) => {
-  const { query } = req.query;
-  try {
-    const results = await searchData(query);
-    res.json(results);
-  } catch (error) {
-    console.error('Search Error:', error);
-    res.status(500).json({ error: 'Error performing search' });
-  }
-});
-
-app.delete('/delete', async (req, res) => {
-  const { title } = req.query;
-  try {
-    const data = await deleteData(title);
-    res.json(data);
-  } catch (error) {
-    console.error('Delete Error:', error);
-    res.status(500).json({ error: 'Error deleting data' });
-  }
-});
-
-app.put('/update', async (req, res) => {
-  const { title, description } = req.body;
-  try {
-    const updatedData = await updateData(title, description);
-    if(updatedData) {
-      res.json(updatedData);
-    } else {
-      res.status(404).send('No document found with that title');
+app.post("/addSearchData", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const data = await addData(req.body);
+      res.status(201).send(data);
+    } catch (error) {
+      res.status(500).send(error.message);
     }
-  } catch (error) {
-    console.error('Update Error:', error);
-    res.status(500).json({ error: 'Error updating data' });
-  }
+  });
+});
+
+app.get("/search", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const results = await searchData(req.query.query);
+      res.json(results);
+    } catch (error) {
+      console.error("Search Error:", error);
+      res.status(500).json({error: "Error performing search"});
+    }
+  });
+});
+
+app.delete("/delete", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const data = await deleteData(req.query.title);
+      res.json(data);
+    } catch (error) {
+      console.error("Delete Error:", error);
+      res.status(500).json({error: "Error deleting data"});
+    }
+  });
+});
+
+app.put("/update", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const updatedData = await updateData(req.body.title, req.body.description);
+      if (updatedData) {
+        res.json(updatedData);
+      } else {
+        res.status(404).send("No document found with that title");
+      }
+    } catch (error) {
+      console.error("Update Error:", error);
+      res.status(500).json({error: "Error updating data"});
+    }
+  });
 });
 
 // Initialize Firebase Admin

@@ -1,15 +1,8 @@
-const searchData = require('./searchModel');
+const searchData = require("./searchModel");
 
 // Delete by title
 const deleteData = async (title) => {
-    try 
-    {
-        return await searchData.findOneAndDelete({ title });
-    } 
-    catch (error) 
-    {
-        throw error;
-    }
-}
+  return await searchData.findOneAndDelete({title});
+};
 
 module.exports = deleteData;

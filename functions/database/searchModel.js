@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const searchSchema = new mongoose.Schema({
   title: {
@@ -22,5 +22,5 @@ const searchSchema = new mongoose.Schema({
   },
 });
 
-const SearchData = mongoose.model('SearchData', searchSchema);
+const SearchData = mongoose.model("SearchData", searchSchema);
 module.exports = SearchData;
