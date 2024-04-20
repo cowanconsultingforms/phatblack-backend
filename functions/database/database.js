@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const mongoose = require("mongoose");
 const mongoURI = functions.config().mongo.uri;
 
+// Connect to MongoDB
 const connectMongoDB = async () => {
   try {
     const conn = await mongoose.connect(mongoURI);
