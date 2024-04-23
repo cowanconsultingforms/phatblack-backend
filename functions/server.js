@@ -99,11 +99,13 @@ admin.initializeApp({
 const deleteUser = require("./cloudFunctions/deleteUser");
 const subscriptionPayment = require("./cloudFunctions/subscriptionPayment");
 const cancelSubscription = require("./cloudFunctions/cancelSubscription");
+const videoCompress = require("./cloudFunctions/videoCompress");
 
 // Export Cloud Functions
 exports.deleteUser = deleteUser;
 exports.subscriptionPayment = subscriptionPayment;
 exports.cancelSubscription = cancelSubscription;
+exports.videoCompress = videoCompress;
 
 // Export the Express API as a Cloud Function
 exports.api = functions.https.onRequest(app);
