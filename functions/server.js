@@ -23,6 +23,8 @@ const searchData = require("./database/searchData");
 const deleteData = require("./database/deleteData");
 const updateData = require("./database/updateData");
 const searchSuggestions = require("./database/searchSuggestions");
+const getAllData = require("./database/getAllData");
+const getOneData = require("./database/getOneData");
 
 const corsHandler = cors({origin: true});
 
@@ -85,6 +87,34 @@ app.get("/searchSuggestions", (req, res) => {
     } catch (error) {
       console.error("Search Suggestions Error:", error);
       res.status(500).json({error: "Error performing search suggestions"});
+    }
+  });
+});
+
+app.get("/getAllData", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const data = await getAllData();
+      res.json(data);
+    } catch (error) {
+      console.error("Get All Data Error:", error);
+      res.status(500).json({error: "Error getting all data"});
+    }
+  });
+});
+
+app.get("/getOneData", (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      const data = await getOneData(req.query.title);
+      if (data) {
+        res.json(data);
+      } else {
+        res.status(404).send("No document found with that title");
+      }
+    } catch (error) {
+      console.error("Get One Data Error:", error);
+      res.status(500).json({error: "Error getting one data"});
     }
   });
 });
